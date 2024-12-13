@@ -8,6 +8,14 @@ class Cart < ApplicationRecord
     cart_item.save!
   end
 
+  def updated_product(product, quantity)
+    cart_item = cart_items.find_or_initialize_by(product_id: product.id)
+    if cart_item.new_record? || quantity > cart_item.quantity
+      cart_item.quantity = quantity 
+      cart_item.save!
+    end
+  end
+
   def sum_price(quantity, price)
     cart_items.joins(:product).sum('products.price * cart_items.quantity')
   end

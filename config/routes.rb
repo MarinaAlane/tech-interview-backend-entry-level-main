@@ -7,4 +7,5 @@ Rails.application.routes.draw do
 
   root "rails/health#show"
   post '/cart', to: 'carts#create'
+  post '/cart/add_item', to: 'carts#update'
 end
