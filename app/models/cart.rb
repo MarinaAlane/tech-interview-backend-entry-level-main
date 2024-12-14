@@ -8,26 +8,27 @@ class Cart < ApplicationRecord
     cart_item.save!
   end
 
-  def updated_product(product, quantity)
-    cart_item = cart_items.find_or_initialize_by(product_id: product)
-    if cart_item.new_record? || quantity > cart_item.quantity
-      cart_item.quantity = quantity 
-      cart_item.save!
+  def update_product(product, quantity)
+    cart_item = cart_items.find_by(product: product)
+    if cart_item
+      if quantity > 0
+        cart_item.update!(quantity: quantity) 
+      else
+        cart_item.destroy!
+      end
     end
   end
 
-  def sum_price(quantity, price)
+  def total_price
     cart_items.joins(:product).sum('products.price * cart_items.quantity')
   end
 
-  def delete_product(product)
-    cart_item = CartItem.where(product_id: product.id)
-
-    cart_item.delete(cart_item)
+  def remove_product(product)
+    cart_items.find_by(product: product)&.destroy!
   end
   
   def list_items
-    cart_items.map do |item|
+    cart_items.includes(:product).map do |item|
       {
         id: item.product.id,
         name: item.product.name,

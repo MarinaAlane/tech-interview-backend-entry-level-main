@@ -1,62 +1,38 @@
 class CartsController < ApplicationController
+  before_action :set_cart
+
   def create
-    product_id = params[:product_id].to_i
-    quantity = params[:quantity].to_i
+    product = Product.find(params[:product_id].to_i)
+    @cart.add_product(product, params[:quantity].to_i)
 
-    product = Product.find(product_id)
-    
-    cart = Cart.find_or_create_by(session_id: session.id.to_s)
-    
-    cart.add_product(product, quantity)
-    total_price = cart.sum_price(product.price, quantity)
-
-    cart.update(total_price: total_price)
-    render json: {
-      id: cart.id,
-      products: cart.list_items,
-      total_price: total_price
-    }
+    render json: cart_json
   end
 
   def update
-    product_id = params[:product_id].to_i
-    quantity = params[:quantity].to_i
+    product = Product.find(params[:product_id].to_i)
+    @cart.update_product(product, params[:quantity].to_i)
 
-    product = Product.find(product_id)
-    cart = Cart.find_or_create_by(session_id: session.id.to_s)
-
-    cart.updated_product(product, quantity)
-    total_price = cart.sum_price(product.price, quantity)
-
-    cart.update(total_price: total_price)
-    render json: {
-      id: cart.id,
-      products: cart.list_items,
-      total_price: total_price
-    }
+    render json: cart_json
   end
 
   def delete
-    product_id = params[:product_id].to_i
+    product = Product.find(params[:product_id].to_i)
+    @cart.remove_product(product)
 
-    product = Product.find(product_id)
-
-    cart = Cart.find_or_create_by(session_id: session.id.to_s)
-
-    cart.delete_product(product)
-    total_price = cart.sum_price(product.price, quantity)
-
-    cart.update(total_price: total_price)
-    render json: {
-      id: cart.id,
-      products: cart.list_items,
-      total_price: total_price
-    }
+    render json: cart_json
   end
 
   private
 
-  def session_localize
-    cart = Cart.find_or_create_by(session_id: session.id.to_s)
+  def set_cart
+    @cart = Cart.find_or_create_by(session_id: session.id.to_s)
+  end
+
+  def cart_json
+    {
+      id: @cart.id,
+      products: @cart.list_items,
+      total_price: @cart.total_price
+    }
   end
 end
