@@ -2,6 +2,8 @@ class Cart < ApplicationRecord
   has_many :cart_items, dependent: :destroy
   has_many :products, through: :cart_items
   after_create :update_total_price 
+  validates :total_price, presence: { message: "must be greater than or equal to 0" }
+  validates :total_price, numericality: { greater_than_or_equal_to: 0, allow_nil: true }
 
   def add_product(product, quantity)
     cart_item = cart_items.find_or_initialize_by(product_id: product.id, quantity: quantity)
