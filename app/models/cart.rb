@@ -1,6 +1,7 @@
 class Cart < ApplicationRecord
   has_many :cart_items, dependent: :destroy
   has_many :products, through: :cart_items
+  after_create :update_total_price 
 
   def add_product(product, quantity)
     cart_item = cart_items.find_or_initialize_by(product_id: product.id, quantity: quantity)
@@ -19,10 +20,6 @@ class Cart < ApplicationRecord
     end
   end
 
-  def total_price
-    cart_items.joins(:product).sum('products.price * cart_items.quantity')
-  end
-
   def remove_product(product)
     cart_items.find_by(product: product)&.destroy!
   end
@@ -37,5 +34,10 @@ class Cart < ApplicationRecord
         total_price: item.quantity * item.product.price
       }
     end
+  end
+
+  def update_total_price
+    self.total_price = cart_items.joins(:product).sum('products.price * cart_items.quantity')
+    save!
   end
 end
