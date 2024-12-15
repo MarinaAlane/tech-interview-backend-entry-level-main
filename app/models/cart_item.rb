@@ -6,6 +6,7 @@ class CartItem < ApplicationRecord
   after_update :update_cart_total_price
   after_destroy :update_cart_total_price
 
+  validates :quantity, numericality: { greater_than_or_equal_to: 0 }
   private
 
   def update_cart_total_price
