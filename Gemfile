@@ -23,3 +23,5 @@ end
 
 group :development do
 end
+
+gem "whenever", "~> 1.0"
