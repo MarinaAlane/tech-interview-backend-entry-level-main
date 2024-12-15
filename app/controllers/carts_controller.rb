@@ -8,6 +8,10 @@ class CartsController < ApplicationController
     render json: cart_json
   end
 
+  def show
+    render json: cart_json
+  end
+
   def update
     product = Product.find(params[:product_id].to_i)
     @cart.update_product(product, params[:quantity].to_i)
